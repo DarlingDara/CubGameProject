@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tes/positionChange_bloc.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -13,96 +14,96 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  final position1 = ValueNotifier<Alignment>(Alignment.topLeft);
-
-  void changePosition(int newPox, int newPoy) {
-    pox = newPox = newPox.clamp(1, 3);
-    poy = newPoy = newPoy.clamp(1, 3);
-
-    position1.value = Alignment(
-      (newPox == 2) ? 0 : (newPox == 1) ? -1 : 1,
-      (newPoy == 2) ? 0 : (newPoy == 1) ? -1 : 1,
-    );
-  }
-
-  int pox = 1;
-  int poy = 1;
-
+class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Column(children: [
-      Expanded(
-        flex: 5,
-        child: Stack(children: [
-          Container(
-              color: Colors.amberAccent,
-              width: double.infinity,
-              // height: 300,
-              child: ValueListenableBuilder(
-                valueListenable: position1,
-                builder: (context, value, child) => Align(
-                  alignment: value,
-                  child: Container(
-                    width: 50,
-                    height: 50,
-                    color: Colors.teal,
-                  ),
+    return BlocProvider(
+      create: (context) => PositionCubit(),
+      child: MyHomePageContent(),
+    );
+  }
+}
+
+class MyHomePageContent extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return
+        Scaffold(
+            body: Column(children: [
+              Expanded(
+                flex: 5,
+                child: Stack(children: [
+                  Container(
+                      color: Colors.amberAccent,
+                      width: double.infinity,
+                      // height: 300,
+                      child: BlocBuilder<PositionCubit, CubePosition>(
+                        builder: (context, position) => Align(
+                          alignment: Alignment(position.x, position.y),
+
+                          child: Container(
+                            width: 50,
+                            height: 50,
+                            color: Colors.teal,
+                          ),
+                        ),
+                       )
+                  )
+                ]),
+              ),
+              Expanded(
+                flex: 3,
+                child: Column(
+                  // mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: 10,
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        BlocProvider.of<PositionCubit>(context).changePosition(0, -1);
+                      },
+                      child: Text("вверх"),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            BlocProvider.of<PositionCubit>(context).changePosition(-1, 0);
+                          },
+                          child: Text("влево"),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            BlocProvider.of<PositionCubit>(context).changePosition(1, 0);
+                          },
+                          child: Text("вправо"),
+                        ),
+                      ],
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        BlocProvider.of<PositionCubit>(context).changePosition(0, 1);
+                      },
+                      child: Text("вниз"),
+                    ),
+                  ],),
+              ),
+              Expanded(
+                flex: 1,
+                child: FilledButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => FirstSceen()),
+                    );
+                  },
+                  child: Text("Меню"),
                 ),
-              ))
-        ]),
-      ),
-      Expanded(
-        flex: 3,
-        child: Column(
-            // mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                height: 10,
               ),
-              ElevatedButton(
-                onPressed: () {
-                  changePosition(pox, --poy);
-                },
-                child: Text("вверх"),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  ElevatedButton(
-                    onPressed: () => changePosition(--pox, poy),
-                    child: Text("влево"),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => changePosition(++pox, poy),
-                    child: Text("вправо"),
-                  ),
-                ],
-              ),
-              ElevatedButton(
-                onPressed: () => changePosition(pox, ++poy),
-                child: Text("вниз"),
-              ),
-            ]),
-      ),
-      Expanded(
-        flex: 1,
-        child: FilledButton(
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => FirstSceen()),
-            );
-          },
-          child: Text("Меню"),
-        ),
-      ),
-    ]));
+            ]));
+
+
   }
 }
 class Message extends StatelessWidget{

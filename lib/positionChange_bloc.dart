@@ -1,26 +1,27 @@
-import 'package:flutter/painting.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class ChangePostion extends Bloc<ChangeEvent, Alignment>
-{
-  final position1 = Alignment.topLeft;
-  int pox = 1;
-  int poy = 1;
-  pox = newPox = newPox.clamp(1, 3);
-  poy = newPoy = newPoy.clamp(1, 3);
-  ChangePostion(): super(Alignment.topLeft){
-    on<ChangeTop>(_onTop);
-    on<ChangeBottom>(_onBottom);
-    on<ChangeLeft>(_onLeft);
-    on<ChangeRight>(_onRight);
-  }
-  _onTop(ChangeTop event, Emitter<Alignment>, emit){
-    emit()
-}
+class CubePosition {
+  double x;
+  double y;
+  CubePosition(this.x, this.y);
 }
 
-abstract class ChangeEvent{}
-class ChangeTop extends ChangeEvent{}
-class ChangeBottom extends ChangeEvent{}
-class ChangeLeft extends ChangeEvent{}
-class ChangeRight extends ChangeEvent{}
+class PositionCubit extends Cubit<CubePosition> {
+  PositionCubit() : super(CubePosition(0, 0));
+
+  void changePosition(int newPox, int newPoy) {
+    double x = state.x;
+    double y = state.y;
+    if (newPox > 0) {
+      x = (x < 1) ? x + 1 : x;
+    } else if (newPox < 0) {
+      x = (x > -1) ? x - 1 : x;
+    }
+    if (newPoy > 0) {
+      y = (y < 1) ? y + 1 : y;
+    } else if (newPoy < 0) {
+      y = (y > -1) ? y - 1 : y;
+    }
+    emit(CubePosition(x, y));
+  }
+}
